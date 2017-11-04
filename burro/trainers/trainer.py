@@ -34,7 +34,7 @@ def train_categorical(data_dir, track, optimizer='adam', patience=10):
     print hist[0]
     print hist[1]
 
-    input_shape=(99-config.camera.crop_top - config.camera.crop_bottom, 132, 3)
+    input_shape=(config.camera.resolution[1]-config.camera.crop_top - config.camera.crop_bottom, config.camera.resolution[0], 3)
     print "Input shape: " + str(input_shape)
 
     models_dir = os.path.abspath(os.path.expanduser(config.training.models_dir))
