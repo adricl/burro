@@ -27,6 +27,7 @@ def image_generator(generator):
                 angle, throttle, ms = methods.parse_img_filepath(file_path)
                 yield img, angle
         except IOError as err:
+            print "File Load Error"
             logging.warning(err)
 
 def image_crop(generator, top=config.camera.crop_top,

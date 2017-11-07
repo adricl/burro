@@ -60,14 +60,15 @@ def train_categorical(data_dir, track, optimizer='adam', patience=10):
     model.add(
         Convolution2D(
             24, (5, 5), strides=(
-                2, 2), activation='relu', input_shape=input_shape))
+                2, 2), activation='relu', input_shape=input_shape))            
     model.add(Convolution2D(32, (5, 5), strides=(2, 2), activation='relu'))
     model.add(Convolution2D(64, (5, 5), strides=(2, 2), activation='relu'))
+    model.add(Convolution2D(64, (3, 3), strides=(2, 2), activation='relu'))
     model.add(Convolution2D(64, (3, 3), strides=(1, 1), activation='relu'))
     model.add(Flatten())
-    model.add(Dense(dense1, activation='selu'))
+    model.add(Dense(dense1, activation='relu'))
     model.add( Dropout(.1) )
-    model.add(Dense(dense2, activation='selu'))
+    model.add(Dense(dense2, activation='relu'))
     model.add( Dropout(.1) )
 
     model.add(
@@ -77,7 +78,8 @@ def train_categorical(data_dir, track, optimizer='adam', patience=10):
             name='angle_out'))
     model.compile(
         optimizer=optimizer, loss={
-            'angle_out': 'categorical_crossentropy'})
+            'angle_out': 'categorical_crossentropy'},
+            loss_weights={'angle_out': 0.9})
 
     print model.summary()
 
@@ -95,9 +97,11 @@ def train_categorical(data_dir, track, optimizer='adam', patience=10):
                                steps_per_epoch=im_count / gen_batch,
                                validation_data=val,
                                validation_steps=im_count / (val_batch * val_stride),
+                               verbose=1,
                                callbacks=[tb, model_cp, e_stop])
+    #print "Loss: " + np.min(hist.history['val_loss'])
 
-    return np.min(hist.history['val_loss'])
+    return 
 
 def train_regression(data_dir, track, optimizer='adam', patience=10):
 
