@@ -8,18 +8,18 @@ from generators.pil_generators import (image_generator, image_mirror,
 from generators.numpy_generators import (category_generator,
                               brightness_shifter, batch_image_generator,
                               center_normalize, equalize_probs, nth_select,
-                              gaussian_noise)
+                              gaussian_noise, strip_angle)
 from generators.misc_generators import angle_to_yaw, yaw_to_log
 
 def categorical_pipeline(data_dir, mode='reject_nth', batch_size=32,
     prob=config.training.equalize_prob_strength,
     noise_scale=config.training.noise_scale,
-    val_every=10, offset=0):
+    val_every=10, offset=0, indefinite=True, graph=False):
     '''
     Generate a pre-processing pipeline for a
     categorical output training problem.
     '''
-    gen = filename_generator(data_dir, indefinite=True)
+    gen = filename_generator(data_dir, indefinite)
     if val_every > 0:
         gen = nth_select(gen, mode=mode, nth=val_every, offset=offset)
     if prob > 0:
@@ -38,7 +38,11 @@ def categorical_pipeline(data_dir, mode='reject_nth', batch_size=32,
     gen = category_generator(gen)
     if batch_size > 1:
         gen = batch_image_generator(gen, batch_size=batch_size)
+
+    if graph: 
+        gen = strip_angle(gen)
     return gen
+
 
 def regression_pipeline(data_dir, mode='reject_nth', batch_size=32,
     prob=config.training.equalize_prob_strength,

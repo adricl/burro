@@ -107,3 +107,7 @@ def gaussian_noise(generator, scale=config.training.noise_scale):
         noisy = np.random.randn(*inp.shape) * scale_instance
         inp = np.clip(inp + noisy, -1.0, 0.9999)
         yield inp, angle
+
+def strip_angle(generator):
+    for inp, angle in generator:
+        yield inp[None,:,:,:], angle

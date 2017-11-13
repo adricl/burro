@@ -57,10 +57,7 @@ def train_categorical(data_dir, track, optimizer='adam', patience=10):
         batch_size=val_batch, offset=offset)
 
     model = Sequential()
-    model.add(
-        Convolution2D(
-            24, (5, 5), strides=(
-                2, 2), activation='relu', input_shape=input_shape))            
+    model.add(Convolution2D(24, (5, 5), strides=(2, 2), activation='relu', input_shape=input_shape))            
     model.add(Convolution2D(32, (5, 5), strides=(2, 2), activation='relu'))
     model.add(Convolution2D(64, (5, 5), strides=(2, 2), activation='relu'))
     model.add(Convolution2D(64, (3, 3), strides=(2, 2), activation='relu'))
@@ -70,25 +67,21 @@ def train_categorical(data_dir, track, optimizer='adam', patience=10):
     model.add( Dropout(.1) )
     model.add(Dense(dense2, activation='relu'))
     model.add( Dropout(.1) )
-
-    model.add(
-        Dense(
-            config.model.output_size,
-            activation='softmax',
-            name='angle_out'))
+    model.add(Dense(config.model.output_size, activation='softmax', name='angle_out'))
+    model.add(Dense(1, activation='relu', name='throttle_out'))
     model.compile(
         optimizer=optimizer, loss={
-            'angle_out': 'categorical_crossentropy'},
-            loss_weights={'angle_out': 0.9})
+            'angle_out': 'categorical_crossentropy',
+            'throttle_out': 'mean_absolute_error'},
+            loss_weights={'angle_out': 0.9, 'throttle_out': .001})
 
     print model.summary()
 
     tb = TensorBoard(log_path)
     # reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.96,
     #          patience=2, min_lr=0.0001)
-    model_cp = ModelCheckpoint(model_path, monitor='val_loss',
-                               save_best_only=True, mode='auto', period=1)
-    e_stop = EarlyStopping(monitor='val_loss', patience=patience)
+    model_cp = ModelCheckpoint(model_path, monitor='val_loss', verbose=verbose, save_best_only=True, mode='min')
+    e_stop = EarlyStopping(monitor='val_loss', min_delta=min_delta, patience=patience, verbose=verbose, mode='auto')
 
     print "Best model saved in " + model_path
 
