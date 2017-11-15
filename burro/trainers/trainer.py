@@ -26,6 +26,8 @@ val_stride = 20
 dense1 = 100
 dense2 = 50
 
+min_delta = 0.005
+
 now = time.strftime("%c")
 
 def train_categorical(data_dir, track, optimizer='adam', patience=10):
@@ -68,20 +70,24 @@ def train_categorical(data_dir, track, optimizer='adam', patience=10):
     model.add(Dense(dense2, activation='relu'))
     model.add( Dropout(.1) )
     model.add(Dense(config.model.output_size, activation='softmax', name='angle_out'))
-    model.add(Dense(1, activation='relu', name='throttle_out'))
+    #model.add(Dense(1, activation='relu', name='throttle_out'))
     model.compile(
         optimizer=optimizer, loss={
             'angle_out': 'categorical_crossentropy',
-            'throttle_out': 'mean_absolute_error'},
-            loss_weights={'angle_out': 0.9, 'throttle_out': .001})
+            #'throttle_out': 'mean_absolute_error'
+            },
+            loss_weights={'angle_out': 0.9,
+            #'throttle_out': .001
+            }
+            )
 
     print model.summary()
 
     tb = TensorBoard(log_path)
     # reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.96,
     #          patience=2, min_lr=0.0001)
-    model_cp = ModelCheckpoint(model_path, monitor='val_loss', verbose=verbose, save_best_only=True, mode='min')
-    e_stop = EarlyStopping(monitor='val_loss', min_delta=min_delta, patience=patience, verbose=verbose, mode='auto')
+    model_cp = ModelCheckpoint(model_path, monitor='val_loss', verbose=True, save_best_only=True, mode='min')
+    e_stop = EarlyStopping(monitor='val_loss', min_delta=min_delta, patience=patience, verbose=True, mode='auto')
 
     print "Best model saved in " + model_path
 
