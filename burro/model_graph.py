@@ -20,7 +20,7 @@ import time
 from docopt import docopt
 
 import methods
-import config
+from config import config
 
 from trainers.img_pipelines import categorical_pipeline, regression_pipeline
 from trainers.generators.pil_generators import show_image
@@ -61,8 +61,28 @@ def main():
     #         },
     #         loss_weights={'angle_out': 0.9})
 
-    prediction = model.predict_generator(pipeline, steps=44, use_multiprocessing=False, verbose=1)
-    print "Prediction " + str(len(prediction[0]))
+
+    for item in pipeline:
+        prediction = model.predict(item[0])
+
+    #predictions = model.predict_generator(pipeline, steps=44, use_multiprocessing=False, verbose=1)
+    #for prediction in predictions:
+        
+        if len(prediction) == 2:
+            yaw_binned = prediction[0]
+            throttle = prediction[1][0][0]
+        else:
+            yaw_binned = prediction
+            throttle = 0
+
+        yaw = methods.from_one_hot(yaw_binned)
+
+        # avf = config.model.average_factor
+        # yaw = (1.0 - avf) * yaw
+        # throttle = throttle * 0.15
+        print "Predicted Angle " + str(yaw) + " Real Angle " + str(methods.from_one_hot(item[1]))
+
+    #print "Prediction " + str(len(prediction[0]))
     #print "Values " + values[0]
     #prediction = prediction.reshape((stream.shape[0],))
     #ax = pd.DataFrame({'predicted':prediction, 'actual':values}).plot()
