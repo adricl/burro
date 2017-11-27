@@ -26,6 +26,7 @@ from trainers.img_pipelines import categorical_pipeline, regression_pipeline
 from trainers.generators.pil_generators import show_image
 from keras.models import load_model
 import pandas as pd
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -61,6 +62,8 @@ def main():
     #         },
     #         loss_weights={'angle_out': 0.9})
 
+    actual = []
+    estimate = []
 
     for item in pipeline:
         prediction = model.predict(item[0])
@@ -80,13 +83,21 @@ def main():
         # avf = config.model.average_factor
         # yaw = (1.0 - avf) * yaw
         # throttle = throttle * 0.15
-        print "Predicted Angle " + str(yaw) + " Real Angle " + str(methods.from_one_hot(item[1]))
+
+        estimate.append(methods.from_one_hot(item[1]))
+        actual.append(yaw)
+        #print "Predicted Angle " + str(yaw) + " Real Angle " + str(methods.from_one_hot(item[1]))
 
     #print "Prediction " + str(len(prediction[0]))
     #print "Values " + values[0]
     #prediction = prediction.reshape((stream.shape[0],))
-    #ax = pd.DataFrame({'predicted':prediction, 'actual':values}).plot()
-    #ax.set_ylabel("steering angle")
+    print "Finished Processing..."
+    ax = pd.DataFrame({'predicted':estimate[:100], 'actual':actual[:100]}).plot()
+    
+    df = ax.plot(kind='scatter', x='predicted', y='actual')
+    #df.set_ylabel("steering angle")
+    #df.plot()
+    plt.savefig('output.png')
 
 
 
