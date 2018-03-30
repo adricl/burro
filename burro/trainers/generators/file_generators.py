@@ -41,4 +41,11 @@ def file_count(file_dir):
     paths = files(file_dir)
     if not paths:
         return 0
-    return len(paths)
+    count = 0
+    for path in paths:
+        angle = methods.parse_img_filepath(path)
+        if angle != 0:
+            count += 2
+        else:
+            count += 1
+    return count

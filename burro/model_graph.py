@@ -61,14 +61,14 @@ def main():
     #         'angle_out': 'categorical_crossentropy',
     #         },
     #         loss_weights={'angle_out': 0.9})
-
+    im_count = pipeline.file_count(data_dir)
     actual = []
     estimate = []
 
     for item in pipeline:
         prediction = model.predict(item[0])
 
-    #predictions = model.predict_generator(pipeline, steps=44, use_multiprocessing=False, verbose=1)
+    #predictions = model.predict_generator(pipeline, steps=im_count, use_multiprocessing=False, verbose=1)
     #for prediction in predictions:
         
         if len(prediction) == 2:

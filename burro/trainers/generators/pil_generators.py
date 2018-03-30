@@ -53,11 +53,16 @@ def image_mirror(generator):
     through mirroring
     '''
     for img, angle in generator:
-        if random.uniform(0.0, 1.0) > 0.5:
-            img = ImageOps.mirror(img)
-            yield img, -angle
+        if angle != 0:
+            for x in range(0,2):
+                if x == 0:
+                    yield img, angle
+                else:
+                    img = ImageOps.mirror(img)
+                    yield img, -angle
         else:
             yield img, angle
+           
 
 def image_rotate(generator, prob=0.4, max_angle=9):
     '''
