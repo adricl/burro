@@ -1,5 +1,6 @@
 import atexit
 import math
+import methods
 
 
 class Driver:
@@ -36,10 +37,11 @@ class NavioPWM(Driver):
     '''
     NAVIO PWM driver
     '''
-    def __init__(self, channel, invert=False):
-        from navio import adafruit_pwm_servo_driver as pwm
+    def __init__(self, channel, invert=False, frequency=60, left_pulse=290, right_pulse=490):
         from navio import util
         import RPi.GPIO as GPIO
+        import Adafruit_PCA9685
+
         util.check_apm()
         
         #Navio+ requires the GPIO line 27 to be set to low 
@@ -49,12 +51,13 @@ class NavioPWM(Driver):
         GPIO.setup(27, GPIO.OUT)
         GPIO.output(27,GPIO.LOW)
 
-        #GPIO.cleanup()
-        self.frequency = 60
+        self.frequency = frequency
         self.channel = channel
         self.invert = invert
-        self.pwm = pwm.PWM()
-        self.pwm.setPWMFreq(self.frequency)
+        self.left_pulse = left_pulse
+        self.right_pulse = right_pulse
+        self.pwm = Adafruit_PCA9685.PCA9685()
+        self.pwm.set_pwm_freq(frequency)
 
     def update(self, value):
         '''
@@ -62,23 +65,11 @@ class NavioPWM(Driver):
         scale between 0 and 4096
         '''
         assert(value <= 1 and -1 <= value)
-        #convert val to ms
-        pwm_val = 1600
 
         if self.invert:
-            pwm_val -= value * 500
-        else:
-            pwm_val +=  value * 500
-
-        #SERVO_MIN_ms = 1100
-        #SERVO_MAX_ms = 2100
-        stepsPerCycle = 4096
-        cycleLengthMicroSeconds = 1000000 / self.frequency
-        stepLengthMicroSeconds = cycleLengthMicroSeconds / stepsPerCycle
-        #convert mS to 0-4096 scale
-        pulseLengthInSteps = math.trunc(pwm_val / stepLengthMicroSeconds) - 1
-        print('Values %d', value, self.channel, pulseLengthInSteps)
-        self.pwm.setPWM(self.channel, 0, pulseLengthInSteps)
+            value = value * -1
+        pulse = methods.map_range(value, -1, 1, self.left_pulse, self.right_pulse)
+        self.pwm.set_pwm(self.channel, 0, pulse) 
 
 
 class Adafruit_MotorHAT(Driver):

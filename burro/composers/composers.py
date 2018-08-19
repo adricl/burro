@@ -69,9 +69,11 @@ class Composer(object):
         if self.board_type is 'navio':
             logging.info("Setting up Ackermann car")
             throttle_driver = NavioPWM(config.ackermann_car_navio.throttle_channel, 
-                invert=config.ackermann_car_navio.throttle_channel_invert)
+                invert=config.ackermann_car_navio.throttle_channel_invert,
+                left_pulse=config.ackermann_car_navio.throttle_stopped_pwm , right_pulse=config.ackermann_car_navio.throttle_forward_pwm)
             steering_driver = NavioPWM(config.ackermann_car_navio.steering_channel,
-                invert=config.ackermann_car_navio.steering_channel_invert)
+                invert=config.ackermann_car_navio.steering_channel_invert,
+                left_pulse=config.ackermann_car_navio.throttle_left_pwm , right_pulse=config.ackermann_car_navio.throttle_right_pwm)
             rover.mixer = AckermannSteeringMixer(
                 steering_driver=steering_driver,
                 throttle_driver=throttle_driver)
