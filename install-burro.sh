@@ -7,7 +7,7 @@ sudo apt-get install --assume-yes libtiff5-dev libjpeg-dev zlib1g-dev \
   libwebp-dev tcl8.5-dev tk8.5-dev python-tk
 sudo apt-get install --assume-yes python-numpy python-scipy python-pillow \
   libhdf5-dev python-h5py python-dev python-pip
-sudo apt-get install --assume-yes python-smbus i2c-tools
+sudo apt-get install --assume-yes python-smbus i2c-tools libatlas-base-dev
 
 echo "\nBurro Installer: Creating environment\n"
 sudo pip install virtualenv
@@ -20,6 +20,10 @@ cd burro
 echo "Burro Installer: Installing Python libraries\n"
 echo "Burro Installer: (this can take some time..)\n"
 ../bin/pip install -r requirements.txt
+
+echo "Installing Tensorflow"
+wget https://www.piwheels.org/simple/tensorflow/tensorflow-1.9.0-cp27-none-linux_armv7l.whl
+../bin/pip install tensorflow-1.9.0-cp27-none-linux_armv7l.whl
 
 echo "\nBurro Installer: Installing submodules\n"
 git submodule update --init --recursive
