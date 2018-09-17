@@ -3,8 +3,7 @@ setuptools==5.5.1
 tornado==4.4.2
 picamera==1.12
 Pillow==4.1.1
-#tensorflow==1.10.0
-keras==2.0.8
+keras==2.2.2
 pyusb==1.0.0
 configobj==5.0.6
 adafruit-pca9685
